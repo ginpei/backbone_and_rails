@@ -1,10 +1,23 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:update, :destroy]
+  protect_from_forgery with: :null_session
+  before_action :set_task, only: [:show, :update, :destroy]
 
   # GET /tasks
   # GET /tasks.json
   def index
     @tasks = Task.all
+    respond_to do |format|
+      format.html { render }
+      format.json { render json: @tasks }
+    end
+  end
+
+  # GET /tasks/show
+  def show
+    respond_to do |format|
+      format.html { render }
+      format.json { render json: @task }
+    end
   end
 
   # GET /tasks/new
@@ -20,7 +33,7 @@ class TasksController < ApplicationController
     respond_to do |format|
       if @task.save
         format.html { redirect_to @task, notice: 'Task was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @task }
+        format.json { redirect_to @task, status: :created, location: @task }
       else
         format.html { render action: 'new' }
         format.json { render json: @task.errors, status: :unprocessable_entity }

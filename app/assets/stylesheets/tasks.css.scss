@@ -1,3 +1,10 @@
+.task {
+	font-weight: bold;
+}
 .task.is-done {
+	color: #090;
+	font-weight: normal;
+}
+.task.is-loading {
 	opacity: 0.5;
 }

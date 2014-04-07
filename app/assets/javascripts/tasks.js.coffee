@@ -9,6 +9,14 @@ $ ->
 		defaults:
 			done: false
 
+		urlRoot: '/tasks'
+
+		url: () ->
+			if @id
+				"#{@urlRoot}/#{@id}.json"
+			else
+				"#{@urlRoot}.json"
+
 		validate: (attributes) ->
 			unless attributes.title
 				return 'title is required'
@@ -24,6 +32,8 @@ $ ->
 	###
 	TaskCollection = Backbone.Collection.extend
 		model: Task
+
+		url: '/tasks.json'
 
 		onlyDone: () ->
 			return @filter((task, index) -> return task.isDone())
@@ -51,15 +61,20 @@ $ ->
 			'change [name=done]': 'onchange'
 
 		initialize: (options) ->
-			@listenTo(@model, 'change', @update)
+			@listenTo(@model, 'change', @render)
 			@listenTo(@model, 'remove', @remove)
+			@listenTo(@model, 'request', => @$el.addClass('is-loading'))
+			@listenTo(@model, 'sync', => @$el.removeClass('is-loading'))
+			@listenTo(@model, 'error', => @$el.removeClass('is-loading'))
 
 		render: () ->
+			task = @model
 			$task = $(@templateHtml)
 			$task.find('[name=done]')
-				.prop('checked', @model.get('done'))
+				.prop('checked', task.get('done'))
 			$task.find('.js-title')
-				.text(@model.get('title'))
+				.text(task.get('title'))
+			$task.toggleClass('is-done', task.isDone())
 
 			@$el.replaceWith($task)
 			@setElement($task)
@@ -69,11 +84,7 @@ $ ->
 		onchange: (event) ->
 			$done = @$('[name=done]')
 			done = $done.prop('checked')
-			@model.set('done', done)
-
-		update: (task) ->
-			@render()
-			@$el.toggleClass('is-done', task.isDone())
+			@model.save({ done })
 
 	###
 	# TaskFormView
@@ -91,6 +102,7 @@ $ ->
 			title = @$('[name=title]').val()
 			task = new Task({ title })
 			if task.isValid()
+				task.save()
 				@tasks.add(task)
 				@$el[0].reset()
 
@@ -120,7 +132,7 @@ $ ->
 		clean: (event) ->
 			tasks = @tasks
 			tasks.onlyDone().forEach (task, index) ->
-				tasks.remove(task)
+				task.destroy()
 
 		count: () ->
 			remains = @tasks.notDone().length
@@ -133,10 +145,7 @@ $ ->
 		# ----------------
 		# models
 
-		tasks = new TaskCollection([
-			{ title:'Buy milk' }
-			{ title:'But 8 eggs' }
-		])
+		tasks = new TaskCollection()
 
 		# ----------------
 		# views
@@ -152,4 +161,7 @@ $ ->
 			el: $list,
 			tasks: tasks
 		})
-		taskListView.count()
+
+		tasks.fetch()
+			.done () ->
+				taskListView.count()

@@ -1,4 +1,4 @@
 BackboneAndRails::Application.routes.draw do
-  resources :tasks, only: [:index, :create, :update, :destroy]
-	root 'tasks#index'
+  resources :tasks, only: [:index, :create, :show, :update, :destroy]
+  root 'tasks#index'
 end
