@@ -13,6 +13,7 @@ class TasksController < ApplicationController
   end
 
   # GET /tasks/show
+  # GET /tasks/show.json
   def show
     respond_to do |format|
       format.html { render }
