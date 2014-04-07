@@ -21,11 +21,6 @@ class TasksController < ApplicationController
     end
   end
 
-  # GET /tasks/new
-  def new
-    @task = Task.new
-  end
-
   # POST /tasks
   # POST /tasks.json
   def create
