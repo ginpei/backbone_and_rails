@@ -98,7 +98,10 @@ $ ->
 		initialize: (options) ->
 			tasks = @tasks = options.tasks
 			@listenTo(tasks, 'add', @addTask)
+			@listenTo(tasks, 'add', @count)
+			@listenTo(tasks, 'change', @count)
 
+			@$remains = @$('.js-tasks-index-remain')
 			@$list = @$('.js-tasks-index-list')
 
 			tasks.each (task, index) =>
@@ -113,6 +116,10 @@ $ ->
 			@tasks.forEach (task, index) ->
 				if task.isDone()
 					tasks.remove(task)
+
+		count: () ->
+			remains = @tasks.filter((task, index) -> return not task.isDone()).length
+			@$remains.text(remains)
 
 	#
 	# main
@@ -140,3 +147,4 @@ $ ->
 			el: $list,
 			tasks: tasks
 		})
+		taskListView.count()
