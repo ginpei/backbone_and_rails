@@ -25,6 +25,12 @@ $ ->
 	TaskCollection = Backbone.Collection.extend
 		model: Task
 
+		onlyDone: () ->
+			return @filter((task, index) -> return task.isDone())
+
+		notDone: () ->
+			return @filter((task, index) -> return not task.isDone())
+
 	# --------------------------------
 	# View
 
@@ -113,12 +119,11 @@ $ ->
 
 		clean: (event) ->
 			tasks = @tasks
-			@tasks.forEach (task, index) ->
-				if task.isDone()
-					tasks.remove(task)
+			tasks.onlyDone().forEach (task, index) ->
+				tasks.remove(task)
 
 		count: () ->
-			remains = @tasks.filter((task, index) -> return not task.isDone()).length
+			remains = @tasks.notDone().length
 			@$remains.text(remains)
 
 	#
