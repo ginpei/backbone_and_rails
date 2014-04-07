@@ -46,6 +46,7 @@ $ ->
 
 		initialize: (options) ->
 			@listenTo(@model, 'change', @update)
+			@listenTo(@model, 'remove', @remove)
 
 		render: () ->
 			$task = $(@templateHtml)
@@ -91,16 +92,27 @@ $ ->
 	# TaskListView
 	###
 	TaskListView = Backbone.View.extend
+		events:
+			'click .js-tasks-index-clear': 'clean'
+
 		initialize: (options) ->
 			tasks = @tasks = options.tasks
 			@listenTo(tasks, 'add', @addTask)
+
+			@$list = @$('.js-tasks-index-list')
 
 			tasks.each (task, index) =>
 				@addTask(task)
 
 		addTask: (task, tasks) ->
 			taskView = new TaskView({ model:task })
-			taskView.render().$el.prependTo(@$el)
+			taskView.render().$el.prependTo(@$list)
+
+		clean: (event) ->
+			tasks = @tasks
+			@tasks.forEach (task, index) ->
+				if task.isDone()
+					tasks.remove(task)
 
 	#
 	# main
