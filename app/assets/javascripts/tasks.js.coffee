@@ -102,8 +102,8 @@ $ ->
 			title = @$('[name=title]').val()
 			task = new Task({ title })
 			if task.isValid()
-				task.save()
 				@tasks.add(task)
+				task.save()
 				@$el[0].reset()
 
 	###
