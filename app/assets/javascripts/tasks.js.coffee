@@ -116,7 +116,7 @@ $ ->
 		initialize: (options) ->
 			tasks = @tasks = options.tasks
 			@listenTo(tasks, 'add', @addTask)
-			@listenTo(tasks, 'add change', @count)
+			@listenTo(tasks, 'reset add change', @count)
 
 			@$remains = @$('.js-tasks-index-remain')
 			@$list = @$('.js-tasks-index-list')
@@ -161,6 +161,4 @@ $ ->
 			tasks: tasks
 		})
 
-		tasks.fetch()
-			.done () ->
-				taskListView.count()
+		tasks.fetch({ reset:true })
